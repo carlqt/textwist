@@ -1,8 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"math/rand"
 	"sort"
+	"time"
 )
 
 type Word []rune
@@ -12,10 +15,17 @@ func (w Word) Swap(i, j int)      { w[i], w[j] = w[j], w[i] }
 func (w Word) Less(i, j int) bool { return w[i] < w[j] }
 
 func main() {
-	str1 := Word("apples")
-	str2 := Word("apple")
+	var input string
 
-	if similar(str1, str2) {
+	str1 := Word("carpenter")
+
+	x := Shuffle(str1)
+	fmt.Println(string(x))
+
+	fmt.Print("Enter a word to compare to carpenter: ")
+	fmt.Scan(&input)
+
+	if similar(str1, []rune(input)) {
 		log.Println("We have the same elements")
 	} else {
 		log.Println("We are not related :(")
@@ -42,11 +52,20 @@ func similar(src, word Word) bool {
 }
 
 func contains(src Word, str rune) bool {
-	for _, a := range src {
-		if a == str {
-			return true
-		}
-	}
+	i := sort.Search(len(src), func(i int) bool { return src[i] >= str })
 
-	return false
+	if i < len(src) && src[i] == str {
+		return true
+	} else {
+		return false
+	}
+}
+func Shuffle(vals Word) Word {
+	r := rand.New(rand.NewSource(time.Now().Unix()))
+	ret := make(Word, len(vals))
+	perm := r.Perm(len(vals))
+	for i, randIndex := range perm {
+		ret[i] = vals[randIndex]
+	}
+	return ret
 }
